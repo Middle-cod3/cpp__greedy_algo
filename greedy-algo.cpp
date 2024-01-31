@@ -1031,6 +1031,547 @@ int eraseOverlapIntervals(vector<vector<int>> &intervals)
     return removeCount;
 }
 
+// ===============================SOME IMPORTANT ALGORITHMS===============================>>
+/*
+1. Activity Selection Problem
+You are given n activities with their start and finish times. Select the maximum number of activities that can be performed by a single person, assuming that a person can only work on a single activity at a time.
+Input: start[]  =  {10, 12, 20}, finish[] =  {20, 25, 30}
+Output: 0 2
+TC : O(N)
+SC : O(1)
+*/
+// bool activityCompare(Activitiy s1, Activitiy s2)
+// {
+//     return (s1.finish < s2.finish);
+// }
+void printMaxActivities(int s[], int f[], int n)
+{
+    // if not sorted then sort according to finish time
+    // sort(arr, arr + n, activityCompare);// here array will contain start and finish time, then time will O(logN)
+    int i, j;
+
+    cout << "Following activities are selected" << endl;
+
+    // The first activity always gets selected
+    i = 0;
+    cout << i << " ";
+
+    // Consider rest of the activities
+    for (j = 1; j < n; j++)
+    {
+        // If this activity has start time greater than or
+        // equal to the finish time of previously selected
+        // activity, then select it
+        if (s[j] >= f[i])
+        {
+            cout << j << " ";
+            i = j;
+        }
+    }
+}
+
+/*
+2. Job Sequencing Problem
+You can found up.
+*/
+
+/*
+3. Huffman Coding
+Its from tree question
+*/
+
+/*
+3. Huffman Decoding
+Its from tree question
+*/
+
+/*
+4. Water connection problem
+Every house in the colony has at most one pipe going into it and at most one pipe going out of it. Tanks and taps are to be installed in a manner such that every house with one outgoing pipe but no incoming pipe gets a tank installed on its roof and every house with only an incoming pipe and no outgoing pipe gets a tap.
+Given two integers n and p denoting the number of houses and the number of pipes. The connections of pipe among the houses contain three input values: a_i, b_i, d_i denoting the pipe of diameter d_i from house a_i to house b_i, find out the efficient solution for the network.
+The output will contain the number of pairs of tanks and taps t installed in first line and the next t lines contain three integers: house number of tank, house number of tap and the minimum diameter of pipe between them.
+TC : O(N)
+SC : O(N)
+*/
+// number of houses and number
+// of pipes
+int number_of_houses, number_of_pipes;
+
+// Array rd stores the
+// ending vertex of pipe
+int ending_vertex_of_pipes[1100];
+
+// Array wd stores the value
+// of diameters between two pipes
+int diameter_between_two_pipes[1100];
+
+// Array cd stores the
+// starting end of pipe
+int starting_vertex_of_pipes[1100];
+
+// Vector a, b, c are used
+// to store the final output
+vector<int> a;
+vector<int> b;
+vector<int> c;
+
+int ans;
+
+int dfs(int w)
+{
+    if (starting_vertex_of_pipes[w] == 0)
+        return w;
+    if (diameter_between_two_pipes[w] < ans)
+        ans = diameter_between_two_pipes[w];
+    return dfs(starting_vertex_of_pipes[w]);
+}
+
+// Function performing calculations.
+void solve(int arr[][3])
+{
+    for (int i = 0; i < number_of_pipes; ++i)
+    {
+
+        int house_1 = arr[i][0], house_2 = arr[i][1],
+            pipe_diameter = arr[i][2];
+
+        starting_vertex_of_pipes[house_1] = house_2;
+        diameter_between_two_pipes[house_1] = pipe_diameter;
+        ending_vertex_of_pipes[house_2] = house_1;
+    }
+
+    a.clear();
+    b.clear();
+    c.clear();
+
+    for (int j = 1; j <= number_of_houses; ++j)
+
+        /*If a pipe has no ending vertex
+        but has starting vertex i.e is
+        an outgoing pipe then we need
+        to start DFS with this vertex.*/
+        if (ending_vertex_of_pipes[j] == 0 && starting_vertex_of_pipes[j])
+        {
+            ans = 1000000000;
+            int w = dfs(j);
+
+            // We put the details of component
+            // in final output array
+            a.push_back(j);
+            b.push_back(w);
+            c.push_back(ans);
+        }
+
+    cout << a.size() << endl;
+    for (int j = 0; j < a.size(); ++j)
+        cout << a[j] << " " << b[j] << " " << c[j] << endl;
+}
+/*
+5. Minimum Swaps for Bracket Balancing
+You are given a string of 2N characters consisting of N ‘[‘ brackets and N ‘]’ brackets. A string is considered balanced if it can be represented in the form S2[S1] where S1 and S2 are balanced strings. We can make an unbalanced string balanced by swapping adjacent characters. Calculate the minimum number of swaps necessary to make a string balanced.
+TC : O(N^2)
+SC :O(1)
+*/
+int swapCountBruteforce(string s)
+{
+    // To store answer
+    int ans = 0;
+
+    // To store count of '['
+    int count = 0;
+
+    // Size of string
+    int n = s.size();
+
+    // Traverse over the string
+    for (int i = 0; i < n; i++)
+    {
+        // When '[' encounters
+        if (s[i] == '[')
+        {
+            count++;
+        }
+        // when ']' encounters
+        else
+        {
+            count--;
+        }
+        // When count becomes less than 0
+        if (count < 0)
+        {
+            // Start searching for '[' from (i+1)th index
+            int j = i + 1;
+            while (j < n)
+            {
+                // When jth index contains '['
+                if (s[j] == '[')
+                {
+                    break;
+                }
+                j++;
+            }
+            // Increment answer
+            ans += j - i;
+
+            // Set Count to 1 again
+            count = 1;
+
+            // Bring character at jth position to ith position
+            // and shift all character from i to j-1
+            // towards right
+            char ch = s[j];
+            for (int k = j; k > i; k--)
+            {
+                s[k] = s[k - 1];
+            }
+            s[i] = ch;
+        }
+    }
+    return ans;
+}
+// TC : O(N)
+// SC : O(N)
+long swapCountOptimal(string s)
+{
+    // Keep track of '['
+    vector<int> pos;
+    for (int i = 0; i < s.length(); ++i)
+        if (s[i] == '[')
+            pos.push_back(i);
+
+    int count = 0; // To count number of encountered '['
+    int p = 0;     // To track position of next '[' in pos
+    long sum = 0;  // To store result
+
+    for (int i = 0; i < s.length(); ++i)
+    {
+        // Increment count and move p to next position
+        if (s[i] == '[')
+        {
+            ++count;
+            ++p;
+        }
+        else if (s[i] == ']')
+            --count;
+
+        // We have encountered an unbalanced part of string
+        if (count < 0)
+        {
+            // Increment sum by number of swaps required
+            // i.e. position of next '[' - current position
+            sum += pos[p] - i;
+            swap(s[i], s[pos[p]]);
+            ++p;
+
+            // Reset count to 1
+            count = 1;
+        }
+    }
+    return sum;
+}
+// TC :O(N)
+// SC :O(1)
+long swapCountMostOptimal(string chars)
+{
+
+    // Stores total number of Left and
+    // Right brackets encountered
+    int countLeft = 0, countRight = 0;
+
+    // swap stores the number of swaps
+    // required imbalance maintains
+    // the number of imbalance pair
+    int swap = 0, imbalance = 0;
+
+    for (int i = 0; i < chars.length(); i++)
+    {
+        if (chars[i] == '[')
+        {
+
+            // Increment count of Left bracket
+            countLeft++;
+
+            if (imbalance > 0)
+            {
+
+                // swaps count is last swap count + total
+                // number imbalanced brackets
+                swap += imbalance;
+
+                // imbalance decremented by 1 as it solved
+                // only one imbalance of Left and Right
+                imbalance--;
+            }
+        }
+        else if (chars[i] == ']')
+        {
+
+            // Increment count of Right bracket
+            countRight++;
+
+            // imbalance is reset to current difference
+            // between Left and Right brackets
+            imbalance = (countRight - countLeft);
+        }
+    }
+    return swap;
+}
+
+/*
+6. Egyptian Fraction
+Every positive fraction can be represented as sum of unique unit fractions. A fraction is unit fraction if numerator is 1 and denominator is a positive integer, for example 1/3 is a unit fraction. Such a representation is called Egyptian Fraction as it was used by ancient Egyptians.
+TC : O(d)
+SC :O(1)
+
+*/
+void egyptianFractionBruteforce(int n, int d)
+{
+    // When Both Numerator and denominator becomes zero then we simply return;
+    if (d == 0 || n == 0)
+        return;
+    if (d % n == 0)
+    {
+        cout << "1/" << d / n;
+        return;
+    }
+    if (n % d == 0)
+    {
+        cout << n / d;
+        return;
+    }
+    if (n > d)
+    {
+        cout << n / d << " + ";
+        egyptianFractionBruteforce(n % d, d);
+        return;
+    }
+    int x = d / n + 1;
+    cout << "1/" << x << " + ";
+    egyptianFractionBruteforce(n * x - d, d * x);
+}
+// TC :O(N^2)
+// SC :O(N)
+vector<int> getEgyptianFractionUtil(int numerator, int denominator,
+                                    vector<int> listOfDenoms)
+{
+    if (numerator == 0)
+        return listOfDenoms;
+
+    int newDenom = ceil((double)denominator / numerator);
+
+    // append in output list
+    listOfDenoms.push_back(newDenom);
+
+    listOfDenoms = getEgyptianFractionUtil(
+        numerator * newDenom - denominator,
+        newDenom * denominator, listOfDenoms);
+
+    return listOfDenoms;
+}
+string getEgyptianFractionOptimal(int numerator, int denominator)
+{
+    string str = "";
+    vector<int> output = getEgyptianFractionUtil(numerator, denominator, {});
+    for (auto denom : output)
+        str += "1/" + to_string(denom) + " + ";
+
+    string strCopy = str.substr(0, str.length() - 3); // removing the last + sign
+    return strCopy;
+}
+
+/*
+7.Policemen catch thieves
+Given an array of size n that has the following specifications:
+
+Each element in the array contains either a policeman or a thief.
+Each policeman can catch only one thief.
+A policeman cannot catch a thief who is more than K units away from the policeman.
+We need to find the maximum number of thieves that can be caught.
+Input : arr[] = {'P', 'T', 'T', 'P', 'T'},
+            k = 1.
+Output : 2.
+TC : O(N)
+SC : O(N)
+*/
+int policeThiefBruteforce(char arr[], int n, int k)
+{
+    int res = 0;
+    vector<int> thi;
+    vector<int> pol;
+
+    // store indices in the vector
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == 'P')
+            pol.push_back(i);
+        else if (arr[i] == 'T')
+            thi.push_back(i);
+    }
+
+    // track lowest current indices of
+    // thief: thi[l], police: pol[r]
+    int l = 0, r = 0;
+    while (l < thi.size() && r < pol.size())
+    {
+        // can be caught
+        if (abs(thi[l] - pol[r]) <= k)
+        {
+            l++;
+            r++;
+            res++;
+        }
+        // increment the minimum index
+        else if (thi[l] < pol[r])
+        {
+            l++;
+        }
+        else
+        {
+            r++;
+        }
+    }
+    return res;
+}
+
+// TC : O(N)
+// SC : O(1)
+int policeThiefOptimal(char arr[], int n, int k)
+{
+    // Initialize the current lowest indices of
+    // policeman in pol and thief in thi variable as -1
+    int pol = -1, thi = -1, res = 0;
+    // Find the lowest index of policemen
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == 'P')
+        {
+            pol = i;
+            break;
+        }
+    }
+
+    // Find the lowest index of thief
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i] == 'T')
+        {
+            thi = i;
+            break;
+        }
+    }
+
+    // If lowest index of either policemen or thief remain
+    // -1 then return 0
+    if (thi == -1 || pol == -1)
+        return 0;
+    while (pol < n && thi < n)
+    {
+        // can be caught
+        if (abs(pol - thi) <= k)
+        {
+
+            pol = pol + 1;
+            while (pol < n && arr[pol] != 'P')
+                pol = pol + 1;
+
+            thi = thi + 1;
+            while (thi < n && arr[thi] != 'T')
+                thi = thi + 1;
+
+            res++;
+        }
+        // increment the current min(pol , thi) to
+        // the next policeman or thief found
+        else if (thi < pol)
+        {
+            thi = thi + 1;
+            while (thi < n && arr[thi] != 'T')
+                thi = thi + 1;
+        }
+        else
+        {
+            pol = pol + 1;
+            while (pol < n && arr[pol] != 'P')
+                pol = pol + 1;
+        }
+    }
+    return res;
+}
+
+/*
+8. Fitting Shelves Problem
+Given length of wall w and shelves of two lengths m and n, find the number of each type of shelf to be used and the remaining empty space in the optimal solution so that the empty space is minimum. The larger of the two shelves is cheaper so it is preferred. However cost is secondary and first priority is to minimize empty space on wall.
+Input : w = 24 m = 3 n = 5
+Output : 3 3 0
+TC : O(w/max(n,m))
+SC : O(1)
+*/
+void minSpacePreferLarge(int wall, int m, int n)
+{
+    // for simplicity, Assuming m is always smaller than n
+    // initializing output variables
+    int num_m = 0, num_n = 0, min_empty = wall;
+
+    // p and q are no of shelves of length m and n
+    // rem is the empty space
+    int p = wall / m, q = 0, rem = wall % m;
+    num_m = p;
+    num_n = q;
+    min_empty = rem;
+    while (wall >= n)
+    {
+        // place one more shelf of length n
+        q += 1;
+        wall = wall - n;
+        // place as many shelves of length m
+        // in the remaining part
+        p = wall / m;
+        rem = wall % m;
+
+        // update output variablse if curr
+        // min_empty <= overall empty
+        if (rem <= min_empty)
+        {
+            num_m = p;
+            num_n = q;
+            min_empty = rem;
+        }
+    }
+
+    cout << num_m << " " << num_n << " "
+         << min_empty << endl;
+}
+
+/*
+9. Assign Mice to Holes
+There are N Mice and N holes are placed in a straight line. Each hole can accommodate only 1 mouse. A mouse can stay at his position, move one step right from x to x + 1, or move one step left from x to x -1. Any of these moves consumes 1 minute. Assign mice to holes so that the time when the last mouse gets inside a hole is minimized.
+TC :O(nlog(n))
+SC O(1)
+*/
+int assignHole(int mices[], int holes[],
+               int n, int m)
+{
+
+    // Base Condition
+    // No. of mouse and holes should be same
+    if (n != m)
+        return -1;
+
+    // Sort the arrays
+    sort(mices, mices + n);
+    sort(holes, holes + m);
+
+    // Finding max difference between
+    // ith mice and hole
+    int max = 0;
+    for (int i = 0; i < n; ++i)
+    {
+        if (max < abs(mices[i] - holes[i]))
+            max = abs(mices[i] - holes[i]);
+    }
+    return max;
+}
+
 // ================================MAIN START=================================>>
 int main()
 {
@@ -1106,13 +1647,65 @@ int main()
     // newInterval.push_back(2);
     // newInterval.push_back(5);
     // vector<vector<int>> ans = insert(intervals, newInterval);
-    vector<vector<int>> arr = {{1, 3}, {8, 10}, {2, 6}, {15, 18}};
+    // vector<vector<int>> arr = {{1, 3}, {8, 10}, {2, 6}, {15, 18}};
     // vector<vector<int>> ans = mergeOverlappingIntervalsBruteforce(arr);
     // printVectorVector(ans);
     // vector<vector<int>> ans2 = mergeOverlappingIntervalsOptimal(arr);
     // printVectorVector(ans2);
-    cout<<eraseOverlapIntervals(arr);
+    // cout << eraseOverlapIntervals(arr);
+    // ===============================SOME IMPORTANT ALGORITHMS===============================>>
+    // int s[] = {1, 3, 0, 5, 8, 5};
+    // int f[] = {2, 4, 6, 7, 9, 9};
+    // int n = sizeof(s) / sizeof(s[0]);
 
+    // Function call
+    // printMaxActivities(s, f, n);
+    // number_of_houses = 9, number_of_pipes = 6;
+
+    // memset(ending_vertex_of_pipes, 0,
+    //        sizeof(ending_vertex_of_pipes));
+    // memset(starting_vertex_of_pipes, 0,
+    //        sizeof(starting_vertex_of_pipes));
+    // memset(diameter_between_two_pipes, 0,
+    //        sizeof(diameter_between_two_pipes));
+
+    // int arr[][3] = {{7, 4, 98}, {5, 9, 72}, {4, 6, 10}, {2, 8, 22}, {9, 7, 17}, {3, 1, 66}};
+
+    // solve(arr);
+    // string s = "[]][][";
+    // cout << swapCountMostOptimal(s) << "\n";
+    // int numerator = 6, denominator = 14;
+    // cout << "Egyptian Fraction representation of "
+    //      << numerator << "/" << denominator << " is"
+    //      << endl;
+    // egyptianFractionBruteforce(numerator, denominator);
+    // cout<<endl;
+    // cout<<getEgyptianFractionOptimal(numerator,denominator);
+    // char arr2[] = {'T', 'T', 'P', 'P', 'T', 'P'};
+    // int k = 2;
+    // int n = sizeof(arr2) / sizeof(arr2[0]);
+    // cout << "Maximum thieves caught: "
+    //      << policeThiefOptimal(arr2, n, k) << endl;
+    // int wall = 29, m = 3, n = 9;
+    // minSpacePreferLarge(wall, m, n);
+    // Position of mouses
+    int mices[] = {4, -4, 2};
+
+    // Position of holes
+    int holes[] = {4, 0, 5};
+
+    // Number of mouses
+    int n = sizeof(mices) / sizeof(mices[0]);
+
+    // Number of holes
+    int m = sizeof(holes) / sizeof(holes[0]);
+
+    // The required answer is returned
+    // from the function
+    int minTime = assignHole(mices, holes, n, m);
+
+    cout << "The last mouse gets into the hole in time:"
+         << minTime << endl;
     // End code here-------->>
 
     return 0;
