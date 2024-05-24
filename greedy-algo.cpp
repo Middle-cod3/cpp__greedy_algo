@@ -5,7 +5,23 @@
 #include <limits>
 #include <vector>
 using namespace std;
-
+typedef vector<int> VI;
+typedef vector<vector<int>> VVI;
+typedef vector<pair<int, int>> VPI;
+typedef vector<string> VS;
+typedef queue<int> QU;
+typedef queue<pair<int, int>> QP;
+typedef queue<pair<pair<int, int>, int>> QPP;
+#define PB push_back
+#define SZA(arr) (sizeof(arr) / sizeof(arr[0]))
+#define SZ(x) ((int)x.size())
+#define LEN(x) ((int)x.length())
+#define REV(x) reverse(x.begin(), x.end());
+#define trav(a, x) for (auto &a : x)
+#define FOR(i, n) for (int i = 0; i < n; i++)
+#define FOR_INNER(j, i, n) for (int j = i; j < n; j++)
+#define FOR1(i, n) for (int i = 1; i <= n; i++)
+#define SORT(x) sort(x.begin(), x.end())
 // Short function start-->>
 void printArray(int arr[], int length)
 {
@@ -97,7 +113,10 @@ Assign Mice to Holes
 1. Assign Cookies
 ANS : Assume you are an awesome parent and want to give your children some cookies. But, you should give each child at most one cookie.
 
-Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with; and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i, and the child i will be content. Your goal is to maximize the number of your content children and output the maximum number.
+Each child i has a greed factor g[i], which is the minimum size of a cookie that the child will be content with;
+and each cookie j has a size s[j]. If s[j] >= g[i], we can assign the cookie j to the child i,
+and the child i will be content. Your goal is to maximize the number of your content children and
+output the maximum number.
 Input : g = [1,2], s = [1,2,3]  || Output :2
 */
 // Bruteforce ----------->
@@ -110,16 +129,20 @@ Input : g = [1,2], s = [1,2,3]  || Output :2
 // TC : O(max(m, n) + (m * log m) + (n * log n)), where ,mlogm and nlogn is for sorting
 // SC : O(1)
 // Find minimum sized cookie which satisfies the child
-int findContentChildren(vector<int> &g, vector<int> &s)
+/*
+Intuitions : We've to give mazimum cookies so if you sort both cookies and children array then loop simultaneously
+and assign cookies to children if chd[i]<=cook[i] else go to next cookie Base condition is if any one loop exceed then return loop index
+*/
+int findContentChildren(VI &child, VI &cookie)
 {
-    int m = g.size();
-    int n = s.size();
-    sort(g.begin(), g.end());
-    sort(s.begin(), s.end());
+    int m = SZ(child);
+    int n = SZ(cookie);
+    SORT(child);
+    SORT(cookie);
     int i = 0, j = 0;
     while (i < m && j < n)
     {
-        if (g[i] <= s[j])
+        if (child[i] <= cookie[j])
         { // satisfied
             i++;
         }
@@ -143,6 +166,19 @@ Input :  N = 3, W = 50 value[] = {60,100,120} weight[] = {10,20,30} || Output : 
 // Optimal ---------->
 // TC : O(n log n + n). O(n log n) to sort the items and O(n) to iterate through all the items for calculating the answer.
 // SC : O(1)
+/*
+Approach: The greedy method to maximize our answer will be to pick up the items with higher values.
+Since it is possible to break the items as well we should focus on picking up items having higher value /weight first.
+To achieve this, items should be sorted in decreasing order with respect to their value /weight.
+Once the items are sorted we can iterate. Pick up items with weight lesser than or equal to the current capacity of the knapsack.
+In the end, if the weight of an item becomes more than what we can carry, break the item into smaller units.
+Calculate its value according to our current capacity and add this new value to our answer.
+
+Explain : Sort according to desc order(3,2,1) in value/weight cz you can pick elem that not exceed knapsack weight
+so you picked up and fill.
+Here, is a other word you can use fraction so you can take any weights fraction so it will also descrease value
+
+*/
 struct Item
 {
     int value;
@@ -151,9 +187,10 @@ struct Item
 class Solution
 {
 public:
-    bool static comp(Item a, Item b)
+    bool static comp(Item a, Item b) // for pair<int,int>a
     {
-        double r1 = (double)a.value / (double)a.weight;
+
+        double r1 = (double)a.value / (double)a.weight; // here you can use instea of weight=first and value=second
         double r2 = (double)b.value / (double)b.weight;
         return r1 > r2;
     }
@@ -162,6 +199,7 @@ public:
     {
 
         sort(arr, arr + n, comp);
+        // if you have VPI then you can use a.begin(),a.end(),comp
 
         int curWeight = 0;
         double finalvalue = 0.0;
@@ -222,7 +260,7 @@ int minCoins(int coins[], int n, int V)
 ANS : At a lemonade stand, each lemonade costs $5. Customers are standing in a queue to buy from you and order one at a time (in the order specified by bills). Each customer will only buy one lemonade and pay with either a $5, $10, or $20 bill. You must provide the correct change to each customer so that the net transaction is that the customer pays $5.
 Note that you do not have any change in hand at first.
 Given an integer array bills where bills[i] is the bill the ith customer pays, return true if you can provide every customer with the correct change, or false otherwise.
-Input :   || Output :
+Input :  [5, 5, 5, 10, 20] || Output :
 */
 // Bruteforce ----------->
 // TC :
@@ -233,10 +271,19 @@ Input :   || Output :
 // Optimal ---------->
 // TC :O(n)
 // SC :O(1)
+/*
+Intuitions : If seller have already [5, 5, 5, 10, 20] this coins at first he can sell 3 lemonade so
+you have now 5+5+5 now second if he sell lemonade he can give 5$ change also same for third he can give 15$ return.
+So, I'll be carrying a variable that keeps a track of 5 & 10 & 20 anytime a customer comes
+with a 5 denomination i simply add it the 5 variable
+with a 10 denomination i add it to 10 and reduce from 5
+with a 20 denomination i add it to 20 and reduce from 5 & 10 || (5,10),(5,5,5)
+we're returning 5 & 10 so i don't need 20 to remember
+*/
 bool lemonadeChange(vector<int> &bills)
 {
     int count5 = 0, count10 = 0;
-    for (int bill : bills)
+    trav(bill, bills)
     {
         if (bill == 5)
         {
@@ -399,14 +446,21 @@ Input : nums = [2,3,1,1,4]  || Output : true
 // Optimal ---------->
 // TC :O(N)
 // SC :O(1)
+/*
+Intuition : Array elems represents your maximum jump length if its 2 then you can got next 1 elem or next 2 elem
+As our observation if we can manage to max Index that can be touched and max index>=n then we can say Yes
+we can reach the end so try a loop from 0->n and add index+arr[i] this way you can touched max index
+Here you've to add 2 condition like if my current index is less than max index then return false and 2 nd condition is
+if we exceed array length or reached we can return yes
+*/
 bool canJump(vector<int> &nums)
 {
     int furthestReachable = 0;
-    int n = nums.size();
-    for (int i = 0; i < n; ++i)
+    int n = SZ(nums);
+    FOR(i, n)
     {
         // Update furthest reachable index based on current element
-        if (i > furthestReachable)
+        if (i > furthestReachable) // If you have't reached me that means you can't jump from here
         {
             return false; // If current position is unreachable, return false
         }
@@ -430,17 +484,70 @@ Return the minimum number of jumps to reach nums[n - 1]. The test cases are gene
 Input : nums = [2,3,1,1,4]  || Output :2
 */
 // Bruteforce ----------->
-// TC :
-// SC :
-// Better ----------->
-// TC :
-// SC :
+
+// TC : Exponential in nature it can be O(N^n)
+// SC : Auxiliary stack space O(n)
+/* Intuitions : Here confirmly states that we can reach last index but we have to retutn total no of jumps.
+so we're trying using recursive version so we can pick minimum
+*/
+int jumpHelper(int ind, int jump, VI &nums, int n)
+{
+    if (ind >= n - 1)
+        return jump;
+    int mini = INT_MAX;
+    for (int i = 1; i <= nums[ind]; i++)
+    {
+        mini = min(mini, jumpHelper(ind + i, jump + 1, nums, n));
+    }
+    return mini;
+}
+int jumpRecr(vector<int> &nums)
+{
+    int n = SZ(nums);
+    return jumpHelper(0, 0, nums, n);
+}
+// Better ------using Memo----->
+// TC : O(N^2)
+// SC :O(N)
+int jumpMemoHelper(int ind, vector<int> &nums, vector<int> &memo)
+{
+    int n = nums.size();
+    if (ind >= n - 1)
+        return 0; // If the current index is at or beyond the last index
+    if (memo[ind] != -1)
+        return memo[ind]; // Check if result is already computed
+
+    int mini = INT_MAX;
+    for (int i = 1; i <= nums[ind]; i++)
+    { // Include nums[ind] as a valid jump
+        if (ind + i < n)
+        { // Ensure we do not go out of bounds
+            int jumps = jumpMemoHelper(ind + i, nums, memo);
+            if (jumps != INT_MAX)
+            {                                // Check if a valid path was found
+                mini = min(mini, jumps + 1); // Increment jump count and find the minimum
+            }
+        }
+    }
+    return memo[ind] = mini; // Store the result in the memo array
+}
+int jumpMemo(vector<int> &nums)
+{
+    int n = SZ(nums);
+    vector<int> memo(n, -1); // Initialize memo array with -1
+    return jumpMemoHelper(0, nums, memo);
+}
 // Optimal ---------->
 // TC :O(N)
 // SC :O(1)
+/* Intuitions : Here confirmly states that we can reach last index but we have to retutn total no of jumps.
+so
+*/
 int jump(vector<int> &nums)
 {
     int n = nums.size();
+    if (n <= 1)
+        return 0;
     int jumps = 0;
     int furthestReachable = 0;
     int currentMaxReachable = 0;
@@ -808,6 +915,34 @@ float sjf(int n, vector<int> &arrivalTime, vector<int> &burstTime)
 
     // Return average waiting time
     return totalWaitingTime / n;
+}
+/*
+Intuition : As per SJF algorithm it is starting that the one with the least execution time
+will be executed first so as per input after sorting [1,2,3,4,7]
+for 1 it stared at time 0->1=0
+for 2 it stared at time 1->1+2=1
+for 3 it stared at time 3->1+2+3=3
+for 4 it stared at time 6->1+2+3+4=6
+for 7 it stared at time 10->1+2+3+4+7=10
+now sum up the wating time and calculate avarage like sum=(0+1+3+6+10)/5=4
+So, First sort the array
+then init variable timer and waitTime
+then loop from 0->n-1
+then waitTime +=time and time +=arr[i]
+and return waitTime/n
+*/
+// Time : O(n)+O(nlogn)
+long long solveSjf(vector<int> &bt)
+{
+    int n = SZ(bt);
+    SORT(bt);
+    long long time = 0, waitTime = 0;
+    FOR(i, n)
+    {
+        waitTime += time;
+        time += bt[i];
+    }
+    return (waitTime / n);
 }
 /*
 13. LRU Page Replacement Algo
@@ -1571,6 +1706,7 @@ int assignHole(int mices[], int holes[],
     }
     return max;
 }
+// -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=->>
 
 // ================================MAIN START=================================>>
 int main()
@@ -1584,6 +1720,10 @@ int main()
            int maxi = *max_element(arr.begin(), arr.end());
             int sum = accumulate(arr.begin(), arr.end(), 0);
     */
+    // Given values for 854th and 855th numbers
+    // Generate all sequences from 00000 to 99999
+    // Generate all sequences from 00000 to 99999
+    // Generate all sequences from 00000 to 99999
     // vector<int> grid = {1, 2, 3, 4, 5};
 
     // vector<int> s = {1, 2, 3};
@@ -1599,14 +1739,17 @@ int main()
     // int n = 9;
     // cout<<"Total coin needed "<<minCoins(coins,n,V);
     // vector<int> arr = {5, 5, 5, 10, 20};
-    // cout << lemonadeChange(arr);
+    // cout << (lemonadeChange(arr) ? "Yes" : "No") << endl;
     // cout << checkValidString("(*)");
     // vector<int> start = {1, 3, 0, 5, 8, 5};
     // vector<int> end = {2, 4, 5, 7, 9, 9};
     // Nmeet obj;
     // cout << obj.maximumMeetings(start, end);
-    // vector<int> arr = {1, 2, 0, 0, 3};
+    vector<int> arr = {2, 3, 1, 1, 4};
     // cout << (canJump(arr) ? "Yes" : "No");
+    cout << jumpRecr(arr) << endl;
+    cout << jumpMemo(arr) << endl;
+    cout << jump(arr) << endl;
     // int arr[] = {900, 945, 955, 1100, 1500, 1800};
     // int dep[] = {920, 1200, 1130, 1150, 1900, 2000};
     // int n = sizeof(dep) / sizeof(dep[0]);
@@ -1636,6 +1779,8 @@ int main()
     // vector<int> b = {3, 1, 2};
     // cout << sjfBetter(3, a, b) << endl;
     // cout << sjf(3, a, b) << endl;
+    // VI a={3,2,4,1,7};
+    // cout<<solveSjf(a);
     // int pages[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2};
     // int n = sizeof(pages) / sizeof(pages[0]);
     // int capacity = 4;
@@ -1689,23 +1834,45 @@ int main()
     // int wall = 29, m = 3, n = 9;
     // minSpacePreferLarge(wall, m, n);
     // Position of mouses
-    int mices[] = {4, -4, 2};
+    // int mices[] = {4, -4, 2};
 
     // Position of holes
-    int holes[] = {4, 0, 5};
+    // int holes[] = {4, 0, 5};
 
     // Number of mouses
-    int n = sizeof(mices) / sizeof(mices[0]);
+    // int n = sizeof(mices) / sizeof(mices[0]);
 
     // Number of holes
-    int m = sizeof(holes) / sizeof(holes[0]);
+    // int m = sizeof(holes) / sizeof(holes[0]);
 
     // The required answer is returned
     // from the function
-    int minTime = assignHole(mices, holes, n, m);
+    // int minTime = assignHole(mices, holes, n, m);
 
-    cout << "The last mouse gets into the hole in time:"
-         << minTime << endl;
+    // cout << "The last mouse gets into the hole in time:"
+    //  << minTime << endl;
+    // vector<int>nums={3,2,4};
+    // int target=6;
+    // int n = nums.size();
+    // vector<int> temp = nums;
+    // sort(temp.begin(), temp.end());
+    // printVector(temp);
+    // int left = 0, right = n;
+    // while (left < right)
+    // {
+    //     int sum = temp[left] + temp[right];
+    //     if (sum == target)
+    //     {
+    //       cout<<left<<" "<<right;
+    //     }
+    //     else if (sum < target)
+    //     {
+    //         left++;
+    //     }
+    //     else
+    //         right--;
+    // }
+
     // End code here-------->>
 
     return 0;
