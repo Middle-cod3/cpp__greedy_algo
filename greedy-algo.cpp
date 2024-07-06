@@ -179,6 +179,7 @@ so you picked up and fill.
 Here, is a other word you can use fraction so you can take any weights fraction so it will also descrease value
 
 */
+// #### Its diffrent from the DP cz here you can break the items so thats why its called  Fractional Knapsack
 struct Item
 {
     int value;
@@ -330,9 +331,11 @@ Input : s = "(*))"  || Output : true
 // Bruteforce ----------->
 // TC :
 // SC :
+//  Recursion
 // Better ----------->
 // TC :
 // SC :
+// Memoization
 // Optimal ---------->
 // TC : O(n)
 // SC :O(1)
@@ -348,12 +351,12 @@ bool checkValidString(string s)
         }
         else if (ch == ')')
         {
-            minOpen = std::max(minOpen - 1, 0);
+            minOpen = max(minOpen - 1, 0);
             maxOpen--;
         }
         else
         { // '*'
-            minOpen = std::max(minOpen - 1, 0);
+            minOpen = max(minOpen - 1, 0);
             maxOpen++;
         }
         if (maxOpen < 0)
@@ -640,6 +643,13 @@ Input :  'N' = 3, Jobs = [[1, 1, 30], [2, 3, 40], [3, 2, 10]] || Output : [3 80]
 // Optimal ---------->
 // TC :  O(N log N) + O(N*M).
 // SC : O(M) for an array that keeps track on which day which job is performed if M is the maximum deadline available.
+/*
+Intuition : First sort it by job profits to find max profit. Then we need to assign a slot array which have max deadline+1. In this slot assign jobs so for that you have to traverse the through jobs and Check for index to place its from right->left checking for slots for right to left you again need a loop from deadline to 1 not 0. If you find a slot then assign job id to slot and increment cnt Jobs also profit of this jobs.
+
+ Why Slot 0 is Not Used:
+The job deadlines start from 1, so slot 0 is not needed and is left unused.
+We use slot array indexing starting from 1 to match job deadlines directly.
+*/
 struct Job
 {
     int id;     // Job Id
@@ -657,35 +667,35 @@ public:
     pair<int, int> JobScheduling(Job arr[], int n)
     {
 
+        // sort it by profit
         sort(arr, arr + n, comparison);
+        // Find max deadline
         int maxi = arr[0].dead;
         for (int i = 1; i < n; i++)
         {
             maxi = max(maxi, arr[i].dead);
         }
-
         int slot[maxi + 1];
-
         for (int i = 0; i <= maxi; i++)
-            slot[i] = -1;
+            slot[i] = -1; // Assign all index with -1
 
-        int countJobs = 0, jobProfit = 0;
-
-        for (int i = 0; i < n; i++)
-        {
+        // Iterate through the jobs and assign them to slots
+        int cntJobs = 0, jobProfit = 0;
+        FOR(i, n)
+        { // Pick the job
             for (int j = arr[i].dead; j > 0; j--)
-            {
+            { // Check for index to place its from right->left checking for slots
                 if (slot[j] == -1)
                 {
-                    slot[j] = i;
-                    countJobs++;
+                    slot[j] = 1;
+                    cntJobs++;
                     jobProfit += arr[i].profit;
-                    break;
+                    break; // If job is placed then not need go to the left slots
                 }
             }
         }
 
-        return make_pair(countJobs, jobProfit);
+        return make_pair(cntJobs, jobProfit);
     }
 };
 // Another type
@@ -698,6 +708,8 @@ vector<int> jobScheduling(vector<vector<int>> &jobs)
 {
     // Step 1: Sort the jobs by profit in non-increasing order
     sort(jobs.begin(), jobs.end(), comparison);
+    printVectorVector(jobs);
+    cout << endl;
 
     // Step 2: Initialize an array to track slots
     int maxDeadline = 0;
@@ -1745,11 +1757,11 @@ int main()
     // vector<int> end = {2, 4, 5, 7, 9, 9};
     // Nmeet obj;
     // cout << obj.maximumMeetings(start, end);
-    vector<int> arr = {2, 3, 1, 1, 4};
+    // vector<int> arr = {2, 3, 1, 1, 4};
     // cout << (canJump(arr) ? "Yes" : "No");
-    cout << jumpRecr(arr) << endl;
-    cout << jumpMemo(arr) << endl;
-    cout << jump(arr) << endl;
+    // cout << jumpRecr(arr) << endl;
+    // cout << jumpMemo(arr) << endl;
+    // cout << jump(arr) << endl;
     // int arr[] = {900, 945, 955, 1100, 1500, 1800};
     // int dep[] = {920, 1200, 1130, 1150, 1900, 2000};
     // int n = sizeof(dep) / sizeof(dep[0]);
@@ -1757,22 +1769,22 @@ int main()
     // cout << "Minimum number of Platforms required " << countPlatformsOptimal(n, arr, dep) << endl;
     // J obj;
     // Job arr[4] = {{1, 4, 20}, {2, 1, 10}, {3, 2, 40}, {4, 2, 30}};
-    // Job arr[4] = {{1, 4, 20}, {2, 1, 10}, {3, 2, 40}, {4, 2, 30}};
+    Job arr[5] = {{1, 2, 100}, {2, 1, 19}, {3, 2, 27}, {4, 1, 25}, {5, 1, 15}};
 
     // Convert to vector of vectors
-    // vector<vector<int>> jobsVector;
-    // for (int i = 0; i < 4; ++i)
-    // {
-    //     vector<int> job;
-    //     job.push_back(arr[i].id);
-    //     job.push_back(arr[i].dead);
-    //     job.push_back(arr[i].profit);
-    //     jobsVector.push_back(job);
-    // }
-    // pair<int, int> ans = obj.JobScheduling(arr, 4);
-    // vector<int> ans = jobScheduling(jobsVector);
+    vector<vector<int>> jobsVector;
+    for (int i = 0; i < 5; ++i)
+    {
+        vector<int> job;
+        job.push_back(arr[i].id);
+        job.push_back(arr[i].dead);
+        job.push_back(arr[i].profit);
+        jobsVector.push_back(job);
+    }
+    // pair<int, int> ans = JobScheduling(arr, 4);
     // cout << ans.first << " " << ans.second;
-    // printVector(ans);
+    vector<int> ans = jobScheduling(jobsVector);
+    printVector(ans);
     // vector<int> c = {1, 0, 2};
     // cout << candy(c);
     // vector<int> a = {0, 0, 0};
