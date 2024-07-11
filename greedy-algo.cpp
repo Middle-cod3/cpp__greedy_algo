@@ -418,7 +418,13 @@ public:
 
         // Sort meetings based on end times
         sort(meet.begin(), meet.end(), comparator);
+        cout << "Sorted meetings:" << endl;
+        for (const auto &m : meet)
+        {
+            cout << "Meeting " << m.pos << ": Start = " << m.start << ", End = " << m.end << endl;
+        }
 
+        // Now compare meetings end to next meetings start as we sorted according to start and end
         int limit = meet[0].end;
         int count = 1; // Count of meetings
         for (int i = 1; i < n; i++)
@@ -1753,8 +1759,8 @@ int main()
     // vector<int> arr = {5, 5, 5, 10, 20};
     // cout << (lemonadeChange(arr) ? "Yes" : "No") << endl;
     // cout << checkValidString("(*)");
-    // vector<int> start = {1, 3, 0, 5, 8, 5};
-    // vector<int> end = {2, 4, 5, 7, 9, 9};
+    // vector<int> start = {4, 1, 2, 3};
+    // vector<int> end = {6, 2, 4, 5};
     // Nmeet obj;
     // cout << obj.maximumMeetings(start, end);
     // vector<int> arr = {2, 3, 1, 1, 4};
@@ -1769,22 +1775,22 @@ int main()
     // cout << "Minimum number of Platforms required " << countPlatformsOptimal(n, arr, dep) << endl;
     // J obj;
     // Job arr[4] = {{1, 4, 20}, {2, 1, 10}, {3, 2, 40}, {4, 2, 30}};
-    Job arr[5] = {{1, 2, 100}, {2, 1, 19}, {3, 2, 27}, {4, 1, 25}, {5, 1, 15}};
+    // Job arr[5] = {{1, 2, 100}, {2, 1, 19}, {3, 2, 27}, {4, 1, 25}, {5, 1, 15}};
 
     // Convert to vector of vectors
-    vector<vector<int>> jobsVector;
-    for (int i = 0; i < 5; ++i)
-    {
-        vector<int> job;
-        job.push_back(arr[i].id);
-        job.push_back(arr[i].dead);
-        job.push_back(arr[i].profit);
-        jobsVector.push_back(job);
-    }
+    // vector<vector<int>> jobsVector;
+    // for (int i = 0; i < 5; ++i)
+    // {
+    //     vector<int> job;
+    //     job.push_back(arr[i].id);
+    //     job.push_back(arr[i].dead);
+    //     job.push_back(arr[i].profit);
+    //     jobsVector.push_back(job);
+    // }
     // pair<int, int> ans = JobScheduling(arr, 4);
     // cout << ans.first << " " << ans.second;
-    vector<int> ans = jobScheduling(jobsVector);
-    printVector(ans);
+    // vector<int> ans = jobScheduling(jobsVector);
+    // printVector(ans);
     // vector<int> c = {1, 0, 2};
     // cout << candy(c);
     // vector<int> a = {0, 0, 0};
@@ -1884,7 +1890,7 @@ int main()
     //     else
     //         right--;
     // }
-
+ 
     // End code here-------->>
 
     return 0;
