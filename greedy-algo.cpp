@@ -382,6 +382,10 @@ Input :   || Output :
 // SC :
 // Optimal ---------->
 // TC : O(N)+O(NlogN)+O(N)
+// The result is dominated by the term with the highest growth rate as n increases. In this case, O(nlogn) grows faster than O(n)
+// for large values of n.
+// When combining the terms, the lower-order terms (O(n)) become insignificant in the presence of the higher-order term
+// (O(nlogn)). Hence, the overall time complexity simplifies to: O(n)+O(nlogn)+O(n)=O(nlogn)
 // SC :O(N)
 struct meeting
 {
@@ -407,6 +411,12 @@ public:
     {
         int n = start.size();
         vector<meeting> meet(n);
+        // Also instead you can use VPI same TC,SC(without object)
+        // VPI meet(n);
+        // for (int i = 0; i < n; ++i)
+        // {
+        //     meetings[i] = {end[i], start[i]};
+        // }
 
         // Initialize meetings
         for (int i = 0; i < n; i++)
@@ -1890,7 +1900,7 @@ int main()
     //     else
     //         right--;
     // }
- 
+
     // End code here-------->>
 
     return 0;
